@@ -34,11 +34,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.linc.audiowaveform.AudioWaveform
+import com.test.voicerecorder.ui.VoiceRecorderTheme
 import com.test.voicerecorder.voice.VoicePlayer
 import com.test.voicerecorder.voice.VoiceRecorder
-import com.test.voicerecorder.audiofx.AudioEnhancer
 import com.test.voicerecorder.voice.TGAudio
-import com.test.voicerecorder.ui.theme.VoiceRecorderTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -151,7 +150,6 @@ fun AppScreen(
                         .padding(8.dp)
                         .clickable {
                             gc.value = !gc.value
-                            AudioEnhancer.FT_USE_SYSTEM_AGC = gc.value
                         },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -159,7 +157,6 @@ fun AppScreen(
                         checked = gc.value,
                         onCheckedChange = {
                             gc.value = it
-                            AudioEnhancer.FT_USE_SYSTEM_AGC = it
                         }
                     )
                     Spacer(modifier = Modifier.size(16.dp))
@@ -173,7 +170,6 @@ fun AppScreen(
                         .padding(8.dp)
                         .clickable {
                             ns.value = !ns.value
-                            AudioEnhancer.FT_USE_SYSTEM_NS = ns.value
                         },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -181,7 +177,6 @@ fun AppScreen(
                         checked = ns.value,
                         onCheckedChange = {
                             ns.value = it
-                            AudioEnhancer.FT_USE_SYSTEM_NS = it
                         }
                     )
                     Spacer(modifier = Modifier.size(16.dp))
@@ -195,7 +190,6 @@ fun AppScreen(
                         .padding(8.dp)
                         .clickable {
                             aec.value = !aec.value
-                            AudioEnhancer.FT_USE_SYSTEM_AEC = aec.value
                         },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -203,7 +197,6 @@ fun AppScreen(
                         checked = aec.value,
                         onCheckedChange = {
                             aec.value = it
-                            AudioEnhancer.FT_USE_SYSTEM_AEC = it
                         }
                     )
                     Spacer(modifier = Modifier.size(16.dp))
