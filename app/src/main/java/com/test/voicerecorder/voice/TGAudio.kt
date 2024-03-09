@@ -1,4 +1,4 @@
-package com.test.voicerecorder.model
+package com.test.voicerecorder.voice
 
 data class TGAudio(
     val filePath: String

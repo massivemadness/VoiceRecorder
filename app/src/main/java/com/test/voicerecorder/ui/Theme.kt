@@ -1,4 +1,4 @@
-package com.test.voicerecorder.ui.theme
+package com.test.voicerecorder.ui
 
 import android.app.Activity
 import android.os.Build

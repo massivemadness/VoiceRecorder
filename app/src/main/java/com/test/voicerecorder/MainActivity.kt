@@ -1,4 +1,4 @@
-package com.test.voicerecorder.ui
+package com.test.voicerecorder
 
 import android.Manifest
 import android.os.Bundle
@@ -30,15 +30,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.linc.audiowaveform.AudioWaveform
-import com.test.voicerecorder.legacy.UI
 import com.test.voicerecorder.voice.VoicePlayer
 import com.test.voicerecorder.voice.VoiceRecorder
-import com.test.voicerecorder.codec.Opus
 import com.test.voicerecorder.audiofx.AudioEnhancer
-import com.test.voicerecorder.model.TGAudio
+import com.test.voicerecorder.voice.TGAudio
 import com.test.voicerecorder.ui.theme.VoiceRecorderTheme
 
 class MainActivity : ComponentActivity() {
@@ -63,24 +62,20 @@ class MainActivity : ComponentActivity() {
 
         override fun onFail() {
             Toast.makeText(this@MainActivity, "onFail", Toast.LENGTH_SHORT).show()
-            voiceState.value = VoiceData(0, "failure", ByteArray(100))
+            voiceState.value = VoiceData(0, "failure", ShortArray(100))
         }
 
-        override fun onSave(file: String, duration: Int, waveform: ByteArray) {
+        override fun onSave(file: String, duration: Int, waveform: ShortArray) {
             Toast.makeText(this@MainActivity, "onSave, duration = $duration", Toast.LENGTH_SHORT)
                 .show()
-            voiceState.value = VoiceData(
-                duration, file, waveform
-            )
+            voiceState.value = VoiceData(duration, file, waveform)
         }
     }
 
-    private val voiceState = mutableStateOf(VoiceData(0, "null", ByteArray(100)))
+    private val voiceState = mutableStateOf(VoiceData(0, "null", ShortArray(100)))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        UI.initApp()
-        Opus.init()
 
         setContent {
             VoiceRecorderTheme {
@@ -96,6 +91,7 @@ fun AppScreen(
     permissionLauncher: ActivityResultLauncher<String>?,
     recordListener: VoiceRecorder.Listener?,
 ) {
+    val context = LocalContext.current
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -111,21 +107,21 @@ fun AppScreen(
                     Button(
                         onClick = {
                             if (recordListener != null) {
-                                VoiceRecorder.instance().record(recordListener)
+                                VoiceRecorder.record(context, recordListener)
                             }
                         }
                     ) {
                         Text(text = "Start")
                     }
                     Button(
-                        onClick = { VoiceRecorder.instance().save() } // or cancel?
+                        onClick = { VoiceRecorder.save() } // or cancel?
                     ) {
                         Text(text = "Stop")
                     }
                     Button(
                         onClick = {
                             val audio = TGAudio(voiceData.file)
-                            VoicePlayer.instance().playAudio(audio)
+                            VoicePlayer.playAudio(audio)
                         }
                     ) {
                         Text(text = "Play")
@@ -141,7 +137,7 @@ fun AppScreen(
                 Text(text = "Duration: ${voiceData.duration}ms")
                 Spacer(modifier = Modifier.size(16.dp))
                 AudioWaveform(
-                    amplitudes = voiceData.waveform.map(Byte::toInt),
+                    amplitudes = voiceData.waveform.map { it.toInt() },
                     spikeAnimationSpec = tween(0), // fix crash
                     progress = 0f,
                     onProgressChange = {},
@@ -223,7 +219,7 @@ fun AppScreen(
                     Button(
                         onClick = {
                             val audio = TGAudio("/data/data/com.test.voicerecorder/cache/record-1.ogg")
-                            VoicePlayer.instance().playAudio(audio)
+                            VoicePlayer.playAudio(audio)
                         }
                     ) {
                         Text(text = "Play 1")
@@ -232,7 +228,7 @@ fun AppScreen(
                     Button(
                         onClick = {
                             val audio = TGAudio("/data/data/com.test.voicerecorder/cache/record-2.ogg")
-                            VoicePlayer.instance().playAudio(audio)
+                            VoicePlayer.playAudio(audio)
                         }
                     ) {
                         Text(text = "Play 2")
@@ -246,13 +242,13 @@ fun AppScreen(
 data class VoiceData(
     val duration: Int,
     val file: String,
-    val waveform: ByteArray
+    val waveform: ShortArray
 )
 
 @Preview(showBackground = true)
 @Composable
 fun AppScreenPreview() {
     VoiceRecorderTheme {
-        AppScreen(VoiceData(0, "preview", ByteArray(100)), null, null)
+        AppScreen(VoiceData(0, "preview", ShortArray(100)), null, null)
     }
 }
